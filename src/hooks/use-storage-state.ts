@@ -1,6 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 import { useCallback, useEffect, useReducer } from 'react';
-import { Platform } from 'react-native';
+
+import { isWeb } from '@/constants/platform';
 
 type UseStateHook<T> = [[boolean, T | null], (value: T | null) => void];
 
@@ -13,7 +14,7 @@ const useAsyncState = <T>(
   ) as UseStateHook<T>;
 
 export const setStorageItemAsync = async (key: string, value: string | null) => {
-  if (Platform.OS === 'web') {
+  if (isWeb) {
     try {
       if (value === null) {
         localStorage.removeItem(key);
@@ -38,7 +39,7 @@ export const useStorageState = (key: string): UseStateHook<string> => {
   const [state, setState] = useAsyncState<string>();
 
   useEffect(() => {
-    if (Platform.OS === 'web') {
+    if (isWeb) {
       try {
         if (typeof localStorage !== 'undefined') {
           setState(localStorage.getItem(key));

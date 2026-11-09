@@ -118,15 +118,6 @@ const TransferScreen = () => {
         { cancelable: false },
       );
     } catch (caught) {
-      const detail =
-        caught && typeof caught === 'object' && 'detail' in caught
-          ? (caught as { detail?: unknown }).detail
-          : undefined;
-      console.log(
-        'transfer error',
-        caught instanceof Error ? caught.message : caught,
-        detail,
-      );
       setConfirmError(
         caught instanceof Error ? caught.message : 'No se pudo realizar la transferencia.',
       );
