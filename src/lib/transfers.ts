@@ -251,6 +251,8 @@ export const getTransfers = async (token: string) => {
     token: sessionToken,
     baseUrl: TRANSFERS_API_URL,
     unauthorizedMessage: 'La sesión no es válida. Volvé a iniciar sesión.',
+    notFoundMessage: 'No se pudieron obtener las transferencias.',
+    fallbackMessage: 'No se pudieron obtener las transferencias.',
   });
 
   return parseTransferList(data);

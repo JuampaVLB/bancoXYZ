@@ -120,6 +120,8 @@ export const getBalance = async (token: string) => {
     token: sessionToken,
     baseUrl: BALANCE_API_URL,
     unauthorizedMessage: 'La sesión no es válida. Volvé a iniciar sesión.',
+    notFoundMessage: 'No se pudo obtener el saldo.',
+    fallbackMessage: 'No se pudo obtener el saldo.',
   });
 
   return parseBalance(data);

@@ -6,6 +6,9 @@ type ApiRequestOptions = {
   token?: string | null;
   baseUrl?: string;
   unauthorizedMessage?: string;
+  invalidMessage?: string;
+  notFoundMessage?: string;
+  fallbackMessage?: string;
 };
 
 const resolveBaseUrl = (baseUrl?: string) => {
@@ -23,39 +26,54 @@ const resolveBaseUrl = (baseUrl?: string) => {
   return value;
 };
 
-const readErrorMessage = async (response: Response, unauthorizedMessage?: string) => {
+const readRawMessage = async (response: Response) => {
   try {
     const payload: unknown = await response.json();
     if (typeof payload === 'string' && payload.trim()) {
-      return payload;
+      return payload.trim();
     }
     if (payload && typeof payload === 'object') {
       const record = payload as Record<string, unknown>;
       const message =
-        record.message ?? record.mensaje ?? record.title ?? record.error ?? record.detail;
+        record.message ??
+        record.mensaje ??
+        record.mensagem ??
+        record.motivo ??
+        record.title ??
+        record.error ??
+        record.detail;
       if (typeof message === 'string' && message.trim()) {
-        if (response.status === 401 && unauthorizedMessage) {
-          return unauthorizedMessage;
-        }
-        return message;
+        return message.trim();
       }
     }
   } catch {
     // The body is empty or not JSON.
   }
 
-  if (response.status === 401) {
-    return unauthorizedMessage ?? 'No autorizado';
+  return undefined;
+};
+
+const clientMessage = (status: number, options: ApiRequestOptions) => {
+  if (status === 400) {
+    return options.invalidMessage ?? 'Los datos enviados no son válidos.';
   }
 
-  return `Error ${response.status}`;
+  if (status === 401) {
+    return options.unauthorizedMessage ?? 'La sesión no es válida. Volvé a iniciar sesión.';
+  }
+
+  if (status === 404) {
+    return options.notFoundMessage ?? 'No se encontró la información.';
+  }
+
+  return options.fallbackMessage ?? 'No se pudo completar la acción. Intentá de nuevo.';
 };
 
 export const apiRequest = async <T>(
   path: string,
   options: ApiRequestOptions = {},
 ): Promise<T> => {
-  const { method = 'GET', body, token, baseUrl, unauthorizedMessage } = options;
+  const { method = 'GET', body, token, baseUrl } = options;
   const headers: Record<string, string> = {
     Accept: 'application/json',
   };
@@ -68,14 +86,26 @@ export const apiRequest = async <T>(
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${resolveBaseUrl(baseUrl)}${path}`, {
-    method,
-    headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(`${resolveBaseUrl(baseUrl)}${path}`, {
+      method,
+      headers,
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+  } catch (caught) {
+    const error = new Error(
+      options.fallbackMessage ?? 'No se pudo conectar. Intentá de nuevo.',
+    ) as Error & { detail?: unknown };
+    error.detail = caught;
+    throw error;
+  }
 
   if (!response.ok) {
-    throw new Error(await readErrorMessage(response, unauthorizedMessage));
+    const error = new Error(clientMessage(response.status, options)) as Error & { detail?: unknown };
+    error.detail = await readRawMessage(response);
+    throw error;
   }
 
   if (response.status === 204) {

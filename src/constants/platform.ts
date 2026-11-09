@@ -1,4 +1,8 @@
 import { Platform, type KeyboardAvoidingViewProps } from 'react-native';
 
-export const keyboardAvoidingBehavior: KeyboardAvoidingViewProps['behavior'] =
-  Platform.OS === 'ios' ? 'padding' : undefined;
+export const isIOS = Platform.OS === 'ios';
+export const isAndroid = Platform.OS === 'android';
+
+export const keyboardAvoidingBehavior: KeyboardAvoidingViewProps['behavior'] = isIOS
+  ? 'padding'
+  : undefined;
