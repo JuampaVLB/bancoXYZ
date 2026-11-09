@@ -3,12 +3,13 @@ import DateTimePicker, {
 } from '@react-native-community/datetimepicker';
 import { SymbolView } from 'expo-symbols';
 import { useState } from 'react';
-import { Keyboard, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Keyboard, Modal, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ButtonCustom } from '@/components/button-custom';
 import { TextCustom } from '@/components/text-custom';
 import { Colors } from '@/constants/colors';
+import { isAndroid, isIOS } from '@/constants/platform';
 import { formatTransferDate } from '@/lib/transfers';
 
 import { isToday, startOfDay } from '../../utils';
@@ -55,7 +56,7 @@ export const DateField = ({ date, onChange }: DateFieldProps) => {
         />
       </Pressable>
 
-      {open && Platform.OS === 'android' ? (
+      {open && isAndroid ? (
         <DateTimePicker
           value={date}
           mode="date"
@@ -68,7 +69,7 @@ export const DateField = ({ date, onChange }: DateFieldProps) => {
         />
       ) : null}
 
-      {Platform.OS === 'ios' ? (
+      {isIOS ? (
         <Modal
           visible={open}
           transparent
