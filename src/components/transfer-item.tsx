@@ -7,12 +7,13 @@ type TransferItemProps = {
   name: string;
   date: string;
   amount: string;
+  badge?: string;
   divided?: boolean;
 };
 
 const initialFromName = (name: string) => name.trim().charAt(0).toUpperCase() || '?';
 
-export const TransferItem = ({ name, date, amount, divided = false }: TransferItemProps) => (
+export const TransferItem = ({ name, date, amount, badge, divided = false }: TransferItemProps) => (
   <View style={[styles.row, divided && styles.divided]}>
     <View style={styles.avatar}>
       <TextCustom variant="label" color="primary" style={styles.initial}>
@@ -23,7 +24,16 @@ export const TransferItem = ({ name, date, amount, divided = false }: TransferIt
       <TextCustom variant="body" numberOfLines={1} style={styles.name}>
         {name}
       </TextCustom>
-      <TextCustom variant="caption">{date}</TextCustom>
+      <View style={styles.dateRow}>
+        <TextCustom variant="caption">{date}</TextCustom>
+        {badge ? (
+          <View style={styles.badge}>
+            <TextCustom variant="caption" color="accentForeground" style={styles.badgeText}>
+              {badge}
+            </TextCustom>
+          </View>
+        ) : null}
+      </View>
     </View>
     <TextCustom variant="body" style={styles.amount}>
       {amount}
@@ -59,6 +69,22 @@ const styles = StyleSheet.create({
   },
   name: {
     fontWeight: '600',
+  },
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  badge: {
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    backgroundColor: Colors.accent,
+  },
+  badgeText: {
+    fontSize: 11,
+    lineHeight: 14,
+    fontWeight: '700',
   },
   amount: {
     fontWeight: '700',

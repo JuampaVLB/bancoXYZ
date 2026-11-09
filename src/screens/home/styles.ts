@@ -37,4 +37,7 @@ export const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 2,
   },
+  transfersStatus: {
+    paddingVertical: Spacing.three,
+  },
 });
