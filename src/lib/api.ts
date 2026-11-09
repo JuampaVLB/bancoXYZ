@@ -4,17 +4,26 @@ type ApiRequestOptions = {
   method?: string;
   body?: unknown;
   token?: string | null;
+  baseUrl?: string;
+  unauthorizedMessage?: string;
 };
 
-const requireApiUrl = () => {
-  if (!API_URL) {
-    throw new Error('Configurá EXPO_PUBLIC_API_URL en el archivo .env');
+const resolveBaseUrl = (baseUrl?: string) => {
+  const trimmed = (baseUrl ?? API_URL).trim().replace(/\/$/, '');
+  const value = trimmed && !/^https?:\/\//i.test(trimmed) ? `https://${trimmed}` : trimmed;
+
+  if (!value) {
+    throw new Error(
+      baseUrl === undefined
+        ? 'Configurá EXPO_PUBLIC_API_URL en el archivo .env'
+        : 'Configurá EXPO_PUBLIC_BALANCE_API_URL en el archivo .env',
+    );
   }
 
-  return API_URL.replace(/\/$/, '');
+  return value;
 };
 
-const readErrorMessage = async (response: Response) => {
+const readErrorMessage = async (response: Response, unauthorizedMessage?: string) => {
   try {
     const payload: unknown = await response.json();
     if (typeof payload === 'string' && payload.trim()) {
@@ -25,8 +34,8 @@ const readErrorMessage = async (response: Response) => {
       const message =
         record.message ?? record.mensaje ?? record.title ?? record.error ?? record.detail;
       if (typeof message === 'string' && message.trim()) {
-        if (response.status === 401) {
-          return 'Correo o contraseña incorrectos';
+        if (response.status === 401 && unauthorizedMessage) {
+          return unauthorizedMessage;
         }
         return message;
       }
@@ -36,7 +45,7 @@ const readErrorMessage = async (response: Response) => {
   }
 
   if (response.status === 401) {
-    return 'Correo o contraseña incorrectos';
+    return unauthorizedMessage ?? 'No autorizado';
   }
 
   return `Error ${response.status}`;
@@ -46,7 +55,7 @@ export const apiRequest = async <T>(
   path: string,
   options: ApiRequestOptions = {},
 ): Promise<T> => {
-  const { method = 'GET', body, token } = options;
+  const { method = 'GET', body, token, baseUrl, unauthorizedMessage } = options;
   const headers: Record<string, string> = {
     Accept: 'application/json',
   };
@@ -59,14 +68,14 @@ export const apiRequest = async <T>(
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${requireApiUrl()}${path}`, {
+  const response = await fetch(`${resolveBaseUrl(baseUrl)}${path}`, {
     method,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 
   if (!response.ok) {
-    throw new Error(await readErrorMessage(response));
+    throw new Error(await readErrorMessage(response, unauthorizedMessage));
   }
 
   if (response.status === 204) {

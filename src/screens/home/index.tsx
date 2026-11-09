@@ -1,4 +1,5 @@
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -6,9 +7,11 @@ import { ProfileHeader } from '@/components/profile-header';
 import { QuickAction } from '@/components/quick-action';
 import { SectionHeader } from '@/components/section-header';
 import { TransferItem } from '@/components/transfer-item';
+import { BALANCE_API_URL } from '@/constants/api';
 import { useSession } from '@/contexts/auth-context';
+import { formatBalance, getBalance, type AccountBalance } from '@/lib/balance';
 
-import { BalanceCard } from './balance-card';
+import { BalanceCard } from './components/balance-card';
 import { styles } from './styles';
 
 const recentTransfers = [
@@ -17,8 +20,64 @@ const recentTransfers = [
 ];
 
 const HomeScreen = () => {
-  const { user, signOut } = useSession();
+  const { user, signOut, token } = useSession();
   const name = user?.nombre?.trim() || 'Usuario';
+  const [accountBalance, setAccountBalance] = useState<AccountBalance | null>(null);
+  const [loadingBalance, setLoadingBalance] = useState(Boolean(BALANCE_API_URL));
+  const [balanceError, setBalanceError] = useState<string | null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+
+      const loadBalance = async () => {
+        if (!BALANCE_API_URL) {
+          if (active) {
+            setAccountBalance(null);
+            setBalanceError(null);
+            setLoadingBalance(false);
+          }
+          return;
+        }
+
+        if (!token) {
+          if (active) {
+            setAccountBalance(null);
+            setBalanceError('No hay una sesión activa.');
+            setLoadingBalance(false);
+          }
+          return;
+        }
+
+        setLoadingBalance(true);
+        setBalanceError(null);
+
+        try {
+          const nextBalance = await getBalance(token);
+          if (active) {
+            setAccountBalance(nextBalance);
+          }
+        } catch (caught) {
+          if (active) {
+            setAccountBalance(null);
+            setBalanceError(
+              caught instanceof Error ? caught.message : 'No se pudo obtener el saldo.',
+            );
+          }
+        } finally {
+          if (active) {
+            setLoadingBalance(false);
+          }
+        }
+      };
+
+      void loadBalance();
+
+      return () => {
+        active = false;
+      };
+    }, [token]),
+  );
 
   return (
     <View style={styles.container}>
@@ -29,10 +88,15 @@ const HomeScreen = () => {
           <ProfileHeader name={name} onSignOut={signOut} />
 
           <BalanceCard
-            balance="$12.480,55"
-            accountLabel="Cuenta corriente"
-            accountNumber="•••• 4821"
-            status="Activa"
+            balance={
+              accountBalance
+                ? formatBalance(accountBalance.amount, accountBalance.currency)
+                : '—'
+            }
+            accountLabel={accountBalance ? 'Moneda' : undefined}
+            accountNumber={accountBalance?.currency}
+            loading={loadingBalance && !accountBalance}
+            error={balanceError}
           />
 
           <View style={styles.actions}>
