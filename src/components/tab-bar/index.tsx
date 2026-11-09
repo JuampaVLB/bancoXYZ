@@ -1,9 +1,11 @@
 import type { BottomTabBarProps } from 'expo-router/js-tabs';
 import { SymbolView, type SymbolViewProps } from 'expo-symbols';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { TextCustom } from '@/components/text-custom';
 import { Colors } from '@/constants/colors';
+
+import { styles } from './styles';
 
 const icons: Record<string, SymbolViewProps['name']> = {
   index: { ios: 'house.fill', android: 'home', web: 'home' },
@@ -59,23 +61,3 @@ export const TabBar = ({ state, descriptors, emitter, navigateToTab, insets }: B
     })}
   </View>
 );
-
-const styles = StyleSheet.create({
-  bar: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingTop: 10,
-    backgroundColor: Colors.card,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: Colors.border,
-  },
-  item: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 4,
-    paddingVertical: 4,
-  },
-  label: {
-    fontWeight: '600',
-  },
-});

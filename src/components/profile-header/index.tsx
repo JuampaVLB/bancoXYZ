@@ -1,8 +1,10 @@
 import { SymbolView } from 'expo-symbols';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { TextCustom } from '@/components/text-custom';
 import { Colors } from '@/constants/colors';
+
+import { styles } from './styles';
 
 type ProfileHeaderProps = {
   name: string;
@@ -45,42 +47,3 @@ export const ProfileHeader = ({
     ) : null}
   </View>
 );
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.card,
-    shadowColor: Colors.foreground,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 2,
-  },
-  copy: {
-    flex: 1,
-    gap: 2,
-  },
-  name: {
-    fontWeight: '700',
-  },
-  signOut: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.card,
-  },
-  pressed: {
-    opacity: 0.7,
-  },
-});

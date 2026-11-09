@@ -1,6 +1,8 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { TextCustom } from '@/components/text-custom';
+
+import { styles } from './styles';
 
 type SectionHeaderProps = {
   title: string;
@@ -20,15 +22,3 @@ export const SectionHeader = ({ title, actionLabel, onActionPress }: SectionHead
     ) : null}
   </View>
 );
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  title: {
-    fontWeight: '700',
-  },
-});
