@@ -2,6 +2,7 @@ import { createContext, use, useMemo, type PropsWithChildren } from 'react';
 
 import { useStorageState } from '@/hooks/use-storage-state';
 import type { AuthSession, User } from '@/lib/auth';
+import { queryClient } from '@/lib/query-client';
 
 type AuthContextValue = {
   signIn: (session: AuthSession) => void;
@@ -48,6 +49,7 @@ export const SessionProvider = ({ children }: PropsWithChildren) => {
         setSessionJson(JSON.stringify(nextSession));
       },
       signOut: () => {
+        queryClient.clear();
         setSessionJson(null);
       },
       session,

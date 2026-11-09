@@ -1,17 +1,15 @@
-import { useFocusEffect } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Skeleton, TransferListSkeleton } from '@/components/skeleton';
 import { TextCustom } from '@/components/text-custom';
 import { TransferItem } from '@/components/transfer-item';
-import { useSession } from '@/contexts/auth-context';
+import { useRefetchOnFocus, useTransfers } from '@/hooks/use-api-queries';
 import { formatBalance } from '@/lib/balance';
 import {
   filterTransfers,
   formatTransferDate,
-  getTransfers,
   groupTransfers,
   isScheduledTransfer,
   periodRange,
@@ -29,59 +27,15 @@ const transferCountLabel = (count: number) =>
   count === 1 ? '1 transferencia' : `${count} transferencias`;
 
 const HistoryScreen = () => {
-  const { token } = useSession();
-  const [transfers, setTransfers] = useState<Transfer[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const transfersQuery = useTransfers();
   const [query, setQuery] = useState('');
   const [filtersOpen, setFiltersOpen] = useState(true);
   const [period, setPeriod] = useState<PeriodFilter | null>(null);
   const [amount, setAmount] = useState<AmountFilter | null>(null);
 
-  useFocusEffect(
-    useCallback(() => {
-      let active = true;
+  useRefetchOnFocus(transfersQuery.refetch);
 
-      const loadTransfers = async () => {
-        if (!token) {
-          if (active) {
-            setTransfers([]);
-            setError('No hay una sesión activa.');
-            setLoading(false);
-          }
-          return;
-        }
-
-        setLoading(true);
-        setError(null);
-
-        try {
-          const nextTransfers = await getTransfers(token);
-          if (active) {
-            setTransfers(nextTransfers);
-          }
-        } catch (caught) {
-          if (active) {
-            setTransfers([]);
-            setError(
-              caught instanceof Error ? caught.message : 'No se pudieron obtener las transferencias.',
-            );
-          }
-        } finally {
-          if (active) {
-            setLoading(false);
-          }
-        }
-      };
-
-      void loadTransfers();
-
-      return () => {
-        active = false;
-      };
-    }, [token]),
-  );
-
+  const transfers = useMemo<Transfer[]>(() => transfersQuery.data ?? [], [transfersQuery.data]);
   const filtered = useMemo(
     () => filterTransfers(transfers, { query, period, amount }),
     [amount, period, query, transfers],
@@ -122,7 +76,7 @@ const HistoryScreen = () => {
 
           {filtersOpen ? <DateRange from={dateFrom} to={dateTo} /> : null}
 
-          {loading ? (
+          {transfersQuery.isLoading ? (
             <View style={styles.group}>
               <View style={styles.groupHeader}>
                 <Skeleton style={styles.groupTitleSkeleton} />
@@ -132,10 +86,10 @@ const HistoryScreen = () => {
                 <TransferListSkeleton rows={4} />
               </View>
             </View>
-          ) : error ? (
+          ) : transfersQuery.error ? (
             <View style={styles.status}>
               <TextCustom variant="body" color="destructive">
-                {error}
+                {transfersQuery.error.message}
               </TextCustom>
             </View>
           ) : groups.length === 0 ? (

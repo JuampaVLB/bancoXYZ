@@ -1,15 +1,15 @@
-import { router, useFocusEffect } from 'expo-router';
+import { router } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { Alert, Keyboard, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ButtonCustom } from '@/components/button-custom';
 import { TextCustom } from '@/components/text-custom';
 import { Colors } from '@/constants/colors';
-import { useSession } from '@/contexts/auth-context';
-import { formatBalance, getBalance } from '@/lib/balance';
-import { createTransfer, toTransferDate } from '@/lib/transfer';
+import { useBalance, useCreateTransfer, useRefetchOnFocus } from '@/hooks/use-api-queries';
+import { formatBalance } from '@/lib/balance';
+import { toTransferDate } from '@/lib/transfer';
 import { formatTransferDate, isScheduledTransfer } from '@/lib/transfers';
 
 import { AmountField } from './components/amount-field';
@@ -26,48 +26,20 @@ import {
 } from './utils';
 
 const TransferScreen = () => {
-  const { token } = useSession();
+  const balance = useBalance();
+  const createTransferMutation = useCreateTransfer();
   const [amountText, setAmountText] = useState('');
   const [recipientName, setRecipientName] = useState('');
   const [document, setDocument] = useState('');
   const [date, setDate] = useState(startOfToday);
-  const [currency, setCurrency] = useState('');
-  const [availableBalance, setAvailableBalance] = useState<number | undefined>();
   const [confirming, setConfirming] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [confirmError, setConfirmError] = useState<string | null>(null);
+  const currency = balance.data?.currency ?? '';
+  const availableBalance = balance.data?.amount;
+  const submitting = createTransferMutation.isPending;
 
-  useFocusEffect(
-    useCallback(() => {
-      let active = true;
-
-      const loadBalance = async () => {
-        if (!token) {
-          return;
-        }
-
-        try {
-          const balance = await getBalance(token);
-          if (active) {
-            setCurrency(balance.currency);
-            setAvailableBalance(balance.amount);
-          }
-        } catch {
-          if (active) {
-            setCurrency('');
-            setAvailableBalance(undefined);
-          }
-        }
-      };
-
-      void loadBalance();
-
-      return () => {
-        active = false;
-      };
-    }, [token]),
-  );
+  useRefetchOnFocus(balance.refetch);
 
   const amount = parseAmount(amountText);
   const scheduled = isScheduledTransfer(date);
@@ -90,15 +62,14 @@ const TransferScreen = () => {
   };
 
   const onConfirm = async () => {
-    if (!token || amount === null) {
+    if (amount === null) {
       return;
     }
 
-    setSubmitting(true);
     setConfirmError(null);
 
     try {
-      await createTransfer(token, {
+      await createTransferMutation.mutateAsync({
         amount,
         currency,
         document: document.trim(),
@@ -121,8 +92,6 @@ const TransferScreen = () => {
       setConfirmError(
         caught instanceof Error ? caught.message : 'No se pudo realizar la transferencia.',
       );
-    } finally {
-      setSubmitting(false);
     }
   };
 

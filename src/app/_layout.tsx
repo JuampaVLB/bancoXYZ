@@ -1,3 +1,4 @@
+import { QueryClientProvider } from '@tanstack/react-query';
 import { DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -5,6 +6,7 @@ import { useEffect } from 'react';
 
 import { Colors } from '@/constants/colors';
 import { SessionProvider, useSession } from '@/contexts/auth-context';
+import { queryClient } from '@/lib/query-client';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,12 +24,14 @@ const AppTheme = {
 };
 
 const RootLayout = () => (
-  <ThemeProvider value={AppTheme}>
-    <SessionProvider>
-      <StatusBar style="dark" />
-      <RootNavigator />
-    </SessionProvider>
-  </ThemeProvider>
+  <QueryClientProvider client={queryClient}>
+    <ThemeProvider value={AppTheme}>
+      <SessionProvider>
+        <StatusBar style="dark" />
+        <RootNavigator />
+      </SessionProvider>
+    </ThemeProvider>
+  </QueryClientProvider>
 );
 
 const RootNavigator = () => {

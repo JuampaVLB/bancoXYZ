@@ -1,5 +1,5 @@
-import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { router } from 'expo-router';
+import { useCallback } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -9,113 +9,29 @@ import { SectionHeader } from '@/components/section-header';
 import { TransferListSkeleton } from '@/components/skeleton';
 import { TextCustom } from '@/components/text-custom';
 import { TransferItem } from '@/components/transfer-item';
-import { BALANCE_API_URL } from '@/constants/api';
 import { useSession } from '@/contexts/auth-context';
-import { formatBalance, getBalance, type AccountBalance } from '@/lib/balance';
-import {
-  formatTransferDate,
-  getTransfers,
-  isScheduledTransfer,
-  type Transfer,
-} from '@/lib/transfers';
+import { useBalance, useRefetchOnFocus, useTransfers } from '@/hooks/use-api-queries';
+import { formatBalance } from '@/lib/balance';
+import { formatTransferDate, isScheduledTransfer } from '@/lib/transfers';
 
 import { BalanceCard } from './components/balance-card';
 import { styles } from './styles';
 
 const HomeScreen = () => {
-  const { user, signOut, token } = useSession();
+  const { user, signOut } = useSession();
   const name = user?.email?.trim() || 'Usuario';
-  const [accountBalance, setAccountBalance] = useState<AccountBalance | null>(null);
-  const [loadingBalance, setLoadingBalance] = useState(Boolean(BALANCE_API_URL));
-  const [balanceError, setBalanceError] = useState<string | null>(null);
-  const [recentTransfers, setRecentTransfers] = useState<Transfer[]>([]);
-  const [loadingTransfers, setLoadingTransfers] = useState(true);
-  const [transfersError, setTransfersError] = useState<string | null>(null);
+  const balance = useBalance();
+  const transfers = useTransfers();
+  const accountBalance = balance.data;
+  const recentTransfers = transfers.data?.slice(0, 3) ?? [];
+  const { refetch: refetchBalance } = balance;
+  const { refetch: refetchTransfers } = transfers;
 
-  useFocusEffect(
+  useRefetchOnFocus(
     useCallback(() => {
-      let active = true;
-
-      const loadBalance = async () => {
-        if (!BALANCE_API_URL) {
-          if (active) {
-            setAccountBalance(null);
-            setBalanceError(null);
-            setLoadingBalance(false);
-          }
-          return;
-        }
-
-        if (!token) {
-          if (active) {
-            setAccountBalance(null);
-            setBalanceError('No hay una sesión activa.');
-            setLoadingBalance(false);
-          }
-          return;
-        }
-
-        setLoadingBalance(true);
-        setBalanceError(null);
-
-        try {
-          const nextBalance = await getBalance(token);
-          if (active) {
-            setAccountBalance(nextBalance);
-          }
-        } catch (caught) {
-          if (active) {
-            setAccountBalance(null);
-            setBalanceError(
-              caught instanceof Error ? caught.message : 'No se pudo obtener el saldo.',
-            );
-          }
-        } finally {
-          if (active) {
-            setLoadingBalance(false);
-          }
-        }
-      };
-
-      const loadTransfers = async () => {
-        if (!token) {
-          if (active) {
-            setRecentTransfers([]);
-            setTransfersError(null);
-            setLoadingTransfers(false);
-          }
-          return;
-        }
-
-        setLoadingTransfers(true);
-        setTransfersError(null);
-
-        try {
-          const nextTransfers = await getTransfers(token);
-          if (active) {
-            setRecentTransfers(nextTransfers.slice(0, 3));
-          }
-        } catch (caught) {
-          if (active) {
-            setRecentTransfers([]);
-            setTransfersError(
-              caught instanceof Error ? caught.message : 'No se pudieron obtener las transferencias.',
-            );
-          }
-        } finally {
-          if (active) {
-            setLoadingTransfers(false);
-          }
-        }
-      };
-
-      void loadBalance();
-      void loadTransfers();
-
-      return () => {
-        active = false;
-      };
-    }, [token]),
+      void refetchBalance();
+      void refetchTransfers();
+    }, [refetchBalance, refetchTransfers]),
   );
 
   return (
@@ -134,8 +50,8 @@ const HomeScreen = () => {
             }
             accountLabel={accountBalance ? 'Moneda' : undefined}
             accountNumber={accountBalance?.currency}
-            loading={loadingBalance && !accountBalance}
-            error={balanceError}
+            loading={balance.isLoading}
+            error={balance.error?.message}
           />
 
           <View style={styles.actions}>
@@ -158,12 +74,12 @@ const HomeScreen = () => {
               onActionPress={() => router.navigate('/history')}
             />
             <View style={styles.list}>
-              {loadingTransfers ? (
+              {transfers.isLoading ? (
                 <TransferListSkeleton />
-              ) : transfersError ? (
+              ) : transfers.error ? (
                 <View style={styles.transfersStatus}>
                   <TextCustom variant="caption" color="destructive">
-                    {transfersError}
+                    {transfers.error.message}
                   </TextCustom>
                 </View>
               ) : recentTransfers.length === 0 ? (
