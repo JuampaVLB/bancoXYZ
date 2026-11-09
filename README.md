@@ -71,7 +71,7 @@ src/
 
 <img width="1136" height="741" alt="image" src="https://github.com/user-attachments/assets/34ef73c1-0c05-45cb-a564-3467b663622f" />
 
-### Link: [https://excalidraw.com/#json=v_AmYXuwj_OB5czkcalGs,LrnUCvufL87xAdImYiZ_lw](https://www.figma.com/design/HcHgIB18b1hvzItenaEGHS/Accusys?node-id=0-1&t=NcFE0cG5Wgl05iPM-1)
+### Link: https://www.figma.com/design/HcHgIB18b1hvzItenaEGHS/Accusys?node-id=0-1&t=NcFE0cG5Wgl05iPM-1
 
 ## Cómo ejecutarlo
 
