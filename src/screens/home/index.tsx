@@ -24,7 +24,7 @@ import { styles } from './styles';
 
 const HomeScreen = () => {
   const { user, signOut, token } = useSession();
-  const name = user?.nombre?.trim() || 'Usuario';
+  const name = user?.email?.trim() || 'Usuario';
   const [accountBalance, setAccountBalance] = useState<AccountBalance | null>(null);
   const [loadingBalance, setLoadingBalance] = useState(Boolean(BALANCE_API_URL));
   const [balanceError, setBalanceError] = useState<string | null>(null);

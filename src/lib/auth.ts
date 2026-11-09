@@ -66,5 +66,10 @@ export const login = async (input: LoginInput) => {
     fallbackMessage: 'No se pudo iniciar sesión.',
   });
 
-  return parseAuthResponse(data);
+  const session = parseAuthResponse(data);
+  if (!session.user.email) {
+    session.user.email = input.email.trim();
+  }
+
+  return session;
 };
