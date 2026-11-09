@@ -4,6 +4,7 @@ import { Pressable, View } from 'react-native';
 
 import { TextCustom } from '@/components/text-custom';
 import { Colors } from '@/constants/colors';
+import { selectionHaptic } from '@/lib/haptics';
 
 import { styles } from './styles';
 
@@ -40,6 +41,7 @@ export const TabBar = ({ state, descriptors, emitter, navigateToTab, insets }: B
         });
 
         if (!focused && !event.defaultPrevented) {
+          selectionHaptic();
           navigateToTab(route.key);
         }
       };

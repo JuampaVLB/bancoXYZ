@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable } from 'react-native';
 
 import { TextCustom } from '@/components/text-custom';
 import { Colors } from '@/constants/colors';
+import { impactHaptic } from '@/lib/haptics';
 
 import { styles } from './styles';
 
@@ -24,17 +25,12 @@ export const ButtonCustom = ({
   const isDisabled = disabled || loading;
   const isPrimary = variant === 'primary';
 
-  const handlePress = async () => {
+  const handlePress = () => {
     if (isDisabled) {
       return;
     }
 
-    try {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    } catch {
-      // Web or devices without a haptic engine.
-    }
-
+    impactHaptic(Haptics.ImpactFeedbackStyle.Medium);
     onPress();
   };
 

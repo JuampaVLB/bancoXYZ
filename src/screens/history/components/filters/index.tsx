@@ -3,6 +3,7 @@ import { Pressable, View } from 'react-native';
 
 import { TextCustom } from '@/components/text-custom';
 import { Colors } from '@/constants/colors';
+import { selectionHaptic, withHaptic } from '@/lib/haptics';
 import type { AmountFilter, PeriodFilter } from '@/lib/transfers';
 
 import { amountOptions, periodOptions } from '../../utils';
@@ -32,7 +33,10 @@ const chips = <T extends string>(
         key={option.id}
         accessibilityRole="button"
         accessibilityState={{ selected }}
-        onPress={() => onPress(option.id)}
+        onPress={() => {
+          selectionHaptic();
+          onPress(option.id);
+        }}
         style={[styles.chip, selected && styles.chipSelected]}>
         <TextCustom
           variant="label"
@@ -56,7 +60,7 @@ export const HistoryFilters = ({
 }: FiltersProps) => (
   <>
     <View style={styles.bar}>
-      <Pressable accessibilityRole="button" onPress={onToggleOpen} style={styles.button}>
+      <Pressable accessibilityRole="button" onPress={withHaptic(onToggleOpen)} style={styles.button}>
         <SymbolView
           name={{
             ios: 'line.3.horizontal.decrease',
@@ -78,7 +82,7 @@ export const HistoryFilters = ({
         ) : null}
       </Pressable>
       {open ? (
-        <Pressable accessibilityRole="button" hitSlop={8} onPress={onHide}>
+        <Pressable accessibilityRole="button" hitSlop={8} onPress={withHaptic(onHide)}>
           <TextCustom variant="link">Ocultar</TextCustom>
         </Pressable>
       ) : null}

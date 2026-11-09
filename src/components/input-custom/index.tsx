@@ -4,6 +4,7 @@ import { Pressable, TextInput, View, type TextInputProps } from 'react-native';
 
 import { TextCustom } from '@/components/text-custom';
 import { Colors } from '@/constants/colors';
+import { withHaptic } from '@/lib/haptics';
 
 import { styles } from './styles';
 
@@ -61,7 +62,7 @@ export const InputCustom = ({
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={rightAccessibilityLabel}
-              onPress={onRightPress}
+              onPress={withHaptic(onRightPress)}
               style={styles.iconButton}>
               {rightIcon}
             </Pressable>

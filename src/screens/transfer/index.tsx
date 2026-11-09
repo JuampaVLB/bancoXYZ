@@ -9,6 +9,7 @@ import { TextCustom } from '@/components/text-custom';
 import { Colors } from '@/constants/colors';
 import { useBalance, useCreateTransfer, useRefetchOnFocus } from '@/hooks/use-api-queries';
 import { formatBalance } from '@/lib/balance';
+import { withHaptic } from '@/lib/haptics';
 import { toTransferDate } from '@/lib/transfer';
 import { formatTransferDate, isScheduledTransfer } from '@/lib/transfers';
 
@@ -115,7 +116,7 @@ const TransferScreen = () => {
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Volver al inicio"
-                onPress={() => router.navigate('/')}
+                onPress={withHaptic(() => router.navigate('/'))}
                 style={styles.back}>
                 <SymbolView
                   name={{ ios: 'chevron.left', android: 'arrow_back', web: 'arrow_back' }}

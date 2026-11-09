@@ -3,6 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ButtonCustom } from '@/components/button-custom';
 import { TextCustom } from '@/components/text-custom';
+import { withHaptic } from '@/lib/haptics';
 
 import { styles } from './styles';
 
@@ -69,7 +70,7 @@ export const ConfirmSheet = ({
             </TextCustom>
           ) : null}
           <ButtonCustom title="Confirmar y enviar" loading={loading} onPress={onConfirm} />
-          <Pressable accessibilityRole="button" hitSlop={8} disabled={loading} onPress={close}>
+          <Pressable accessibilityRole="button" hitSlop={8} disabled={loading} onPress={withHaptic(close)}>
             <TextCustom variant="link" style={styles.edit}>
               Editar datos
             </TextCustom>

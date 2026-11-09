@@ -3,6 +3,7 @@ import { Pressable, View } from 'react-native';
 
 import { TextCustom } from '@/components/text-custom';
 import { Colors } from '@/constants/colors';
+import { withHaptic } from '@/lib/haptics';
 
 import { styles } from './styles';
 
@@ -36,7 +37,7 @@ export const ProfileHeader = ({
         accessibilityRole="button"
         accessibilityLabel="Cerrar sesión"
         hitSlop={8}
-        onPress={onSignOut}
+        onPress={withHaptic(onSignOut)}
         style={({ pressed }) => [styles.signOut, pressed && styles.pressed]}>
         <SymbolView
           name={{ ios: 'rectangle.portrait.and.arrow.right', android: 'logout', web: 'logout' }}

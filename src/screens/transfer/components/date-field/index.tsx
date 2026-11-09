@@ -10,6 +10,7 @@ import { ButtonCustom } from '@/components/button-custom';
 import { TextCustom } from '@/components/text-custom';
 import { Colors } from '@/constants/colors';
 import { isAndroid, isIOS } from '@/constants/platform';
+import { impactHaptic } from '@/lib/haptics';
 import { formatTransferDate } from '@/lib/transfers';
 
 import { isToday, startOfDay } from '../../utils';
@@ -25,6 +26,7 @@ export const DateField = ({ date, onChange }: DateFieldProps) => {
   const [open, setOpen] = useState(false);
 
   const openPicker = () => {
+    impactHaptic();
     Keyboard.dismiss();
     setOpen(true);
   };
