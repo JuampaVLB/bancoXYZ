@@ -25,9 +25,11 @@ export const styles = StyleSheet.create({
     gap: 6,
     minHeight: 64,
   },
-  loader: {
-    alignSelf: 'flex-start',
-    marginVertical: 8,
+  amountSkeleton: {
+    width: '58%',
+    height: 32,
+    marginVertical: 4,
+    borderRadius: 10,
   },
   error: {
     opacity: 0.9,

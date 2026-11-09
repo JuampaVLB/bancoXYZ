@@ -1,7 +1,7 @@
-import { ActivityIndicator, View } from 'react-native';
+import { View } from 'react-native';
 
+import { Skeleton } from '@/components/skeleton';
 import { TextCustom } from '@/components/text-custom';
-import { Colors } from '@/constants/colors';
 
 import { styles } from './styles';
 
@@ -29,7 +29,7 @@ export const BalanceCard = ({
           Saldo actual
         </TextCustom>
         {loading ? (
-          <ActivityIndicator color={Colors.primaryForeground} style={styles.loader} />
+          <Skeleton tone="onPrimary" style={styles.amountSkeleton} />
         ) : (
           <TextCustom variant="title" color="primaryForeground">
             {balance}

@@ -1,6 +1,6 @@
 import { SymbolView } from 'expo-symbols';
 import { useState } from 'react';
-import { KeyboardAvoidingView, ScrollView, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ButtonCustom } from '@/components/button-custom';
@@ -43,7 +43,13 @@ const LoginScreen = () => {
       const session = await login({ email: email.trim(), password });
       signIn(session);
     } catch (caught) {
-      setFormError(caught instanceof Error ? caught.message : 'No se pudo iniciar sesión.');
+      const message = caught instanceof Error ? caught.message : 'No se pudo iniciar sesión.';
+      if (message === 'Correo o contraseña incorrectos') {
+        Alert.alert('Correo o contraseña incorrectos');
+        return;
+      }
+
+      setFormError(message);
     } finally {
       setLoading(false);
     }

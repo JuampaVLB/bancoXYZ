@@ -46,4 +46,12 @@ export const styles = StyleSheet.create({
     paddingVertical: Spacing.four,
     alignItems: 'flex-start',
   },
+  groupTitleSkeleton: {
+    width: 140,
+    height: 16,
+  },
+  groupCountSkeleton: {
+    width: 56,
+    height: 14,
+  },
 });

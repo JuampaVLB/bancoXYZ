@@ -1,11 +1,11 @@
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Skeleton, TransferListSkeleton } from '@/components/skeleton';
 import { TextCustom } from '@/components/text-custom';
 import { TransferItem } from '@/components/transfer-item';
-import { Colors } from '@/constants/colors';
 import { useSession } from '@/contexts/auth-context';
 import { formatBalance } from '@/lib/balance';
 import {
@@ -123,8 +123,14 @@ const HistoryScreen = () => {
           {filtersOpen ? <DateRange from={dateFrom} to={dateTo} /> : null}
 
           {loading ? (
-            <View style={styles.status}>
-              <ActivityIndicator color={Colors.primary} />
+            <View style={styles.group}>
+              <View style={styles.groupHeader}>
+                <Skeleton style={styles.groupTitleSkeleton} />
+                <Skeleton style={styles.groupCountSkeleton} />
+              </View>
+              <View style={styles.list}>
+                <TransferListSkeleton rows={4} />
+              </View>
             </View>
           ) : error ? (
             <View style={styles.status}>

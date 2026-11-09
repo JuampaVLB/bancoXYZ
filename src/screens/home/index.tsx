@@ -1,15 +1,15 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ProfileHeader } from '@/components/profile-header';
 import { QuickAction } from '@/components/quick-action';
 import { SectionHeader } from '@/components/section-header';
+import { TransferListSkeleton } from '@/components/skeleton';
 import { TextCustom } from '@/components/text-custom';
 import { TransferItem } from '@/components/transfer-item';
 import { BALANCE_API_URL } from '@/constants/api';
-import { Colors } from '@/constants/colors';
 import { useSession } from '@/contexts/auth-context';
 import { formatBalance, getBalance, type AccountBalance } from '@/lib/balance';
 import {
@@ -159,9 +159,7 @@ const HomeScreen = () => {
             />
             <View style={styles.list}>
               {loadingTransfers ? (
-                <View style={styles.transfersStatus}>
-                  <ActivityIndicator color={Colors.primary} />
-                </View>
+                <TransferListSkeleton />
               ) : transfersError ? (
                 <View style={styles.transfersStatus}>
                   <TextCustom variant="caption" color="destructive">
