@@ -1,56 +1,108 @@
-# Welcome to your Expo app 👋
+# bancoXYZ
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+App mobile de home banking. Login, saldo, transferencias e historial.
 
-## Get started
+## Tecnologías
 
-1. Install dependencies
+- React Native con Expo
+- TypeScript
+- Expo Router
+- TanStack React Query
+- Expo SecureStore
+- Expo Haptics
+- `@react-native-community/datetimepicker`
+- Jest con `jest-expo`
 
-   ```bash
-   npm install
-   ```
+## Estructura
 
-2. Start the app
+`src/app` arma la navegación. Cada archivo de ruta es corto y llama a la screen que le corresponde.
 
-   ```bash
-   npx expo start
-   ```
+Hay dos grupos:
 
-In the output, you'll find options to open the app in a
+- `(auth)`: bienvenida y login. Se muestran cuando no hay sesión.
+- `(app)`: Inicio, Transferir e Historial. Se muestran cuando la sesión está guardada.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+La vista vive en `src/screens/<nombre>/`, con `index.tsx` y `styles.ts` separados.
 
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Lo que solo usa esa pantalla queda adentro de ella: un componente en `screens/<nombre>/components/` y un helper en `screens/<nombre>/utils/`. El date picker de transferir, por ejemplo, está en `screens/transfer/components/date-field` porque no lo usa nadie más.
 
-## Get a fresh project
+Lo que se comparte entre pantallas sale de ahí:
 
-When you're ready, run:
+- `src/components`: input, botón, ítem de transferencia, tab bar.
+- `src/lib`: login, saldo, listado y alta de transferencias.
+- `src/hooks` y `src/contexts`: sesión y las queries.
 
-```bash
-npm run reset-project
+```txt
+src/
+  app/
+    (auth)/          bienvenida y login
+    (app)/           inicio, transferir, historial
+  screens/
+    login/
+      index.tsx
+      styles.ts
+    transfer/
+      index.tsx
+      styles.ts
+      components/    solo de esta pantalla
+      utils/
+  components/        piezas compartidas
+  lib/               requests y parseo
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+## Funciones
 
-### Other setup steps
+- Iniciar sesión con email y contraseña.
+- Guardar el token y el usuario en SecureStore y entrar al Home.
+- Ver el saldo.
+- Ver las últimas transferencias en el Home.
+- Transferir: monto, destinatario, documento y fecha, con confirmación.
+- Programar una transferencia con fecha futura.
+- Ver el historial completo, buscar y filtrar por período y monto.
+- Cerrar sesión.
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Flujo
 
-## Learn more
+<img width="1504" height="903" alt="image" src="https://github.com/user-attachments/assets/01464f94-9941-41ca-9e45-274706802922" />
 
-To learn more about developing your project with Expo, look at the following resources:
+### Link: https://excalidraw.com/#json=v_AmYXuwj_OB5czkcalGs,LrnUCvufL87xAdImYiZ_lw
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Diseño UX/UI
 
-## Join the community
+<img width="1136" height="741" alt="image" src="https://github.com/user-attachments/assets/34ef73c1-0c05-45cb-a564-3467b663622f" />
 
-Join our community of developers creating universal apps.
+### Link: [https://excalidraw.com/#json=v_AmYXuwj_OB5czkcalGs,LrnUCvufL87xAdImYiZ_lw](https://www.figma.com/design/HcHgIB18b1hvzItenaEGHS/Accusys?node-id=0-1&t=NcFE0cG5Wgl05iPM-1)
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Cómo ejecutarlo
+
+```bash
+npm install
+npm start
+```
+
+Copiá `.env.example` a `.env` y completá las URLs:
+
+```txt
+EXPO_PUBLIC_API_URL=
+EXPO_PUBLIC_BALANCE_API_URL=
+EXPO_PUBLIC_TRANSFERS_API_URL=
+EXPO_PUBLIC_TRANSFER_API_URL=
+```
+
+## Pruebas unitarias
+
+```bash
+npm test
+```
+
+- `parseAuthResponse` arma la sesión con `token` y `usuario`. Falla si no viene el token.
+- `parseBalance` lee `saldoCuenta` y `moneda`. Falla si no viene el saldo.
+- `parseTransferList` convierte la lista y la ordena de la más nueva a la más vieja. Falla si la respuesta no es una lista.
+- `filterTransfers` busca por nombre y filtra por monto. `groupTransfers` agrupa por mes.
+- `validateTransfer` exige monto mayor a 0, nombre, documento de 7 u 8 números, y un monto que no supere el saldo.
+- `toTransferDate` arma la fecha como `AAAA-MM-DD`.
+
+## Demo
+
+https://github.com/user-attachments/assets/be25fd73-6870-4129-b90b-aa0c966cfcb9
+
