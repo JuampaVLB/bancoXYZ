@@ -62,6 +62,8 @@ export const login = async (input: LoginInput) => {
       [AuthBodyKeys.password]: input.password,
     },
     unauthorizedMessage: 'Correo o contraseña incorrectos',
+    invalidMessage: 'Revisá el correo y la contraseña.',
+    fallbackMessage: 'No se pudo iniciar sesión.',
   });
 
   return parseAuthResponse(data);
