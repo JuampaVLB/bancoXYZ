@@ -1,8 +1,10 @@
 import { SymbolView, type SymbolViewProps } from 'expo-symbols';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { TextCustom } from '@/components/text-custom';
 import { Colors } from '@/constants/colors';
+
+import { styles } from './styles';
 
 type QuickActionProps = {
   label: string;
@@ -23,34 +25,3 @@ export const QuickAction = ({ label, icon, onPress }: QuickActionProps) => (
     </TextCustom>
   </Pressable>
 );
-
-const styles = StyleSheet.create({
-  card: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 10,
-    borderRadius: 22,
-    paddingVertical: 18,
-    paddingHorizontal: 12,
-    backgroundColor: Colors.card,
-    shadowColor: Colors.foreground,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.06,
-    shadowRadius: 16,
-    elevation: 2,
-  },
-  icon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.secondary,
-  },
-  label: {
-    fontWeight: '600',
-  },
-  pressed: {
-    opacity: 0.85,
-  },
-});

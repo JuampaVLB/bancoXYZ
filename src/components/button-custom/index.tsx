@@ -1,8 +1,10 @@
 import * as Haptics from 'expo-haptics';
-import { ActivityIndicator, Pressable, StyleSheet } from 'react-native';
+import { ActivityIndicator, Pressable } from 'react-native';
 
 import { TextCustom } from '@/components/text-custom';
 import { Colors } from '@/constants/colors';
+
+import { styles } from './styles';
 
 type ButtonCustomProps = {
   title: string;
@@ -34,7 +36,7 @@ export const ButtonCustom = ({
     }
 
     onPress();
-  }
+  };
 
   return (
     <Pressable
@@ -61,25 +63,3 @@ export const ButtonCustom = ({
     </Pressable>
   );
 };
-
-const styles = StyleSheet.create({
-  button: {
-    minHeight: 56,
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
-  primary: {
-    backgroundColor: Colors.primary,
-  },
-  secondary: {
-    backgroundColor: Colors.secondary,
-  },
-  disabled: {
-    opacity: 0.45,
-  },
-  pressed: {
-    opacity: 0.85,
-  },
-});
