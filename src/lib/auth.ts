@@ -61,6 +61,7 @@ export const login = async (input: LoginInput) => {
       [AuthBodyKeys.email]: input.email,
       [AuthBodyKeys.password]: input.password,
     },
+    unauthorizedMessage: 'Correo o contraseña incorrectos',
   });
 
   return parseAuthResponse(data);
